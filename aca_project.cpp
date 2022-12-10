@@ -6,17 +6,19 @@ using namespace std;
 
 vector<string> route = {"Railways","Roadways","Airways"};
 
-
+/// 1111 = 15(2^n - 1)
 //Cost Calculation using TSP
-int tsp(int mask,int pos,int n,vector<vector<pi>>& dist, vector<vector<int>>& parent){
+int tsp(int mask,int pos,int n,vector<vector<pi>>& dist, vector<vector<int>>& parent,vector<vector<int>> &dp){
     if(mask == (1<<n) -1){
         return dist[pos][0].first;
     }
 
+    if(dp[pos][mask]!=-1) return dp[pos][mask];
+
     int ans = int_max;
     for(int city=0;city<n;city++){
         if((mask&(1<<city))==0){
-            int newAns = dist[pos][city].first + tsp( mask|(1<<city),city,n,dist,parent);
+            int newAns = dist[pos][city].first + tsp( mask|(1<<city),city,n,dist,parent,dp);
             if(newAns < ans){
                 parent[pos][mask] = city;
                 ans = newAns;
@@ -24,7 +26,7 @@ int tsp(int mask,int pos,int n,vector<vector<pi>>& dist, vector<vector<int>>& pa
         }
     }
 
-    return ans;
+    return dp[pos][mask] = ans;
 }
 
 
@@ -46,7 +48,7 @@ int main(){
 
     cout<<"\n\n";
 
-    vector<vector<pi>> dist(n,vector<pi>(n,{0,0}));
+    vector<vector<pi>> dist(n,vector<pi>(n,{0,0})); // distance matrix
     for(int i=0;i<n;i++){
         for(int j=0;j<n;j++){
             if(i==j) continue;
@@ -70,8 +72,9 @@ int main(){
 
 
     cout<<"\n\n\n\n";
+    vector<vector<int>> dp(n+1,vector<int>((1<<n), -1));
     vector<vector<int>> parent(n+1,vector<int>((1<<n)));
-    cout<<"Total Travelling Cost: "<<m*tsp(1,0,n,dist,parent)<<endl;
+    cout<<"Total Travelling Cost: "<<m*tsp(1,0,n,dist,parent,dp)<<endl;
 
 
     //Finding Path
@@ -99,9 +102,14 @@ int main(){
 
 
 
+
+//TC : O(2^n.n)
+//SC : O(2^n.n)
+
+
 //int vis_all = (1<<n) -1;
 
-// int dist[10][10] = {
+// int dist[4][4] = {
 // 0 1 3 2    ---- 35 each
 //     {0,10,15,20},
 //     {5,0,9,10},
